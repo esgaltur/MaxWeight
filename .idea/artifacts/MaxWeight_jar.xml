@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MaxWeight:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/MaxWeight_jar</output-path>
+    <root id="archive" name="MaxWeight.jar">
+      <element id="module-output" name="MaxWeight" />
+    </root>
+  </artifact>
+</component>
