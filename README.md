@@ -1,3 +1,3 @@
 # MaxWeight
-MADE BY SOSNOVICH DMITRIY(с) 2015.
-Calculation program for bench press by pyramid system ofJurij Verhoshanskij
+##MADE BY Sosnovich Dmitriy(с) 2015.
+###Program for generating the number of exercises and weights on the Professor Yuri Verkhoshansky
