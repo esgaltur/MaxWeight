@@ -1,38 +1,49 @@
 package cz.esgaltur.maxweight.integration;
 
-import cz.esgaltur.maxweight.model.Day;
-import cz.esgaltur.maxweight.model.Exercise;
-import cz.esgaltur.maxweight.model.TrainingProgram;
-import cz.esgaltur.maxweight.model.Week;
-import cz.esgaltur.maxweight.service.ProgramDataService;
-import cz.esgaltur.maxweight.service.ProgramFactory;
+
+import cz.esgaltur.maxweight.core.event.TrainingProgramCreatedEvent;
+import cz.esgaltur.maxweight.core.model.Day;
+import cz.esgaltur.maxweight.core.model.Exercise;
+import cz.esgaltur.maxweight.core.model.TrainingProgram;
+import cz.esgaltur.maxweight.core.model.Week;
+import cz.esgaltur.maxweight.program.service.ProgramDataService;
+import cz.esgaltur.maxweight.program.service.ProgramFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Integration tests for the program generation flow.
  * Tests the integration between ProgramDataService, ProgramFactory, and the model classes.
  */
-public class ProgramIntegrationTest {
+ class ProgramIntegrationTest {
 
     private ProgramDataService dataService;
     private ProgramFactory programFactory;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @BeforeEach
-    public void setUp() {
+     void setUp() {
+        MockitoAnnotations.openMocks(this);
         dataService = new ProgramDataService();
-        programFactory = new ProgramFactory(dataService);
+        programFactory = new ProgramFactory(dataService, eventPublisher);
     }
 
     /**
      * Test the full flow of creating a training program for Week 1.
      */
     @Test
-    public void testCreateProgramForWeek1() {
+     void testCreateProgramForWeek1() {
         // Arrange
         Week week = Week.WEEK1;
         int maxWeight = 100;
@@ -45,6 +56,12 @@ public class ProgramIntegrationTest {
         assertEquals(week, program.getWeek());
         assertEquals(maxWeight, program.getMaxWeight());
         assertFalse(program.isSpecialWeek());
+
+        // Verify that the event publisher was called with the correct event
+        ArgumentCaptor<TrainingProgramCreatedEvent> eventCaptor = ArgumentCaptor.forClass(TrainingProgramCreatedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        TrainingProgramCreatedEvent event = eventCaptor.getValue();
+        assertEquals(program, event.getProgram());
 
         // Verify Day 1 exercises
         List<Exercise> day1Exercises = program.getExercisesForDay(Day.DAY1);
@@ -87,7 +104,7 @@ public class ProgramIntegrationTest {
      * Test the full flow of creating a training program for Week 6 (special week).
      */
     @Test
-    public void testCreateProgramForWeek6() {
+     void testCreateProgramForWeek6() {
         // Arrange
         Week week = Week.WEEK6;
         int maxWeight = 150;
@@ -100,6 +117,12 @@ public class ProgramIntegrationTest {
         assertEquals(week, program.getWeek());
         assertEquals(maxWeight, program.getMaxWeight());
         assertTrue(program.isSpecialWeek());
+
+        // Verify that the event publisher was called with the correct event
+        ArgumentCaptor<TrainingProgramCreatedEvent> eventCaptor = ArgumentCaptor.forClass(TrainingProgramCreatedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        TrainingProgramCreatedEvent event = eventCaptor.getValue();
+        assertEquals(program, event.getProgram());
 
         // Verify Day 1 exercises
         List<Exercise> day1Exercises = program.getExercisesForDay(Day.DAY1);
@@ -142,7 +165,7 @@ public class ProgramIntegrationTest {
      * Test creating programs for all weeks with different max weights.
      */
     @Test
-    public void testCreateProgramsForAllWeeks() {
+     void testCreateProgramsForAllWeeks() {
         // Test for all weeks with different max weights
         testProgramForWeek(Week.WEEK1, 100);
         testProgramForWeek(Week.WEEK2, 110);
@@ -156,6 +179,9 @@ public class ProgramIntegrationTest {
      * Helper method to test program creation for a specific week.
      */
     private void testProgramForWeek(Week week, int maxWeight) {
+        // Reset the mock to clear previous interactions
+        reset(eventPublisher);
+
         // Create program
         TrainingProgram program = programFactory.createProgram(week, maxWeight);
 
@@ -163,6 +189,12 @@ public class ProgramIntegrationTest {
         assertNotNull(program);
         assertEquals(week, program.getWeek());
         assertEquals(maxWeight, program.getMaxWeight());
+
+        // Verify that the event publisher was called with the correct event
+        ArgumentCaptor<TrainingProgramCreatedEvent> eventCaptor = ArgumentCaptor.forClass(TrainingProgramCreatedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        TrainingProgramCreatedEvent event = eventCaptor.getValue();
+        assertEquals(program, event.getProgram());
 
         // Verify exercises for both days
         List<Exercise> day1Exercises = program.getExercisesForDay(Day.DAY1);

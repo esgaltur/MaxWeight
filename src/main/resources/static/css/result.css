@@ -1,0 +1,23 @@
+/* Styles specific to the result page */
+.program-container {
+    margin-bottom: 2rem;
+}
+
+.day-header {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+}
+
+.exercise {
+    margin-bottom: 0.5rem;
+}
+
+.day1-exercise {
+    color: #198754; /* Bootstrap green */
+}
+
+.day2-exercise {
+    color: #fd7e14; /* Bootstrap orange */
+}

@@ -1,30 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MaxWeight - Bench Press Training Program Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-        .header {
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #e5e5e5;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-    </style>
+    <link href="/css/common.css" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="header text-center">
             <h1 th:text="${title}">MaxWeight - Bench Press Training Program Generator</h1>
             <p class="lead">Based on Professor Yuri Verkhoshansky's methodology</p>
+            <p th:if="${traceId}" class="small text-muted">Trace ID: <span th:text="${traceId}">trace-id</span></p>
         </div>
 
         <div class="form-container">
@@ -81,17 +70,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Ensure toWeek is always >= fromWeek
-        document.getElementById('fromWeek').addEventListener('change', function() {
-            var fromWeek = parseInt(this.value);
-            var toWeekSelect = document.getElementById('toWeek');
-            var toWeek = parseInt(toWeekSelect.value);
-            
-            if (toWeek < fromWeek) {
-                toWeekSelect.value = fromWeek;
-            }
-        });
-    </script>
+    <script src="/js/form-validation.js"></script>
+    <script src="/js/notifications.js"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+/* Styles specific to the index page */
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}

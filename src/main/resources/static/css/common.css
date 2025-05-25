@@ -1,0 +1,10 @@
+/* Common styles for all pages */
+body {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e5e5e5;
+}
