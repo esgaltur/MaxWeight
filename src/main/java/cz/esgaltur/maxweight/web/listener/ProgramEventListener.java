@@ -1,5 +1,6 @@
 package cz.esgaltur.maxweight.web.listener;
 
+import brave.Tracer;
 import cz.esgaltur.maxweight.core.event.ProgramsGeneratedEvent;
 import cz.esgaltur.maxweight.core.event.TrainingProgramCreatedEvent;
 import cz.esgaltur.maxweight.core.model.TrainingProgram;
@@ -22,10 +23,12 @@ public class ProgramEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(ProgramEventListener.class);
     private final NotificationService notificationService;
+    private final Tracer tracer;
 
     @Autowired
-    public ProgramEventListener(NotificationService notificationService) {
+    public ProgramEventListener(NotificationService notificationService, Tracer tracer) {
         this.notificationService = notificationService;
+        this.tracer = tracer;
     }
 
     /**
@@ -56,6 +59,13 @@ public class ProgramEventListener {
         notificationData.put("fromWeek", event.getFromWeek());
         notificationData.put("toWeek", event.getToWeek());
         notificationData.put("maxWeight", event.getMaxWeight());
+
+        // Add trace ID if available
+        if (tracer.currentSpan() != null) {
+            String traceId = tracer.currentSpan().context().traceIdString();
+            notificationData.put("traceId", traceId);
+            logger.debug("Adding trace ID {} to notification", traceId);
+        }
 
         // Send notification to all connected clients
         notificationService.sendNotification("PROGRAM_GENERATED", notificationData);

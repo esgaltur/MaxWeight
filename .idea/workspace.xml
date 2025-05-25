@@ -4,59 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e9745d7f-4b84-4a6c-8fcf-9bab82c7bf2b" name="Changes" comment="Migrate to a modularized Spring Boot architecture&#10;&#10;Refactored the application to follow a Modulith architecture by dividing it into `core`, `program`, and `web` modules. Removed the old CLI implementation and integrated a REST API and Thymeleaf web interface. Added event-based communication to improve modularity and maintainability.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/event/ProgramsGeneratedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/event/TrainingProgramCreatedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/package-info.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/program/package-info.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/controller/NotificationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/listener/ProgramEventListener.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/package-info.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/service/NotificationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/service/ProgramGenerationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/service/ProgramValidationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/common.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/result.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/form-validation.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/notifications.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/core/model/TrainingProgramTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/program/ModuleTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/program/service/ProgramFactoryTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/web/listener/ProgramEventListenerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/MaxWeightApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/MaxWeightApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/config/ServerConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/config/TomcatDisabler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/config/WebServerConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/controller/ApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/controller/ApiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/controller/ProgramController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/controller/WebController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/web/controller/WebController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/exception/ValidationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/model/Day.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/model/Day.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/model/Exercise.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/model/Exercise.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/model/TrainingProgram.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/model/TrainingProgram.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/model/Week.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/core/model/Week.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/service/ProgramDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/program/service/ProgramDataService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/service/ProgramFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/program/service/ProgramFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cz/esgaltur/maxweight/view/ProgramView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/result.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/result.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/WebServerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/controller/ApiControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/web/controller/ApiControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/controller/WebControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/web/controller/WebControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/integration/ProgramIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/integration/ProgramIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/model/DayTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/core/model/DayTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/model/ExerciseTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/core/model/ExerciseTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/model/TrainingProgramTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/model/WeekTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/core/model/WeekTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/service/ProgramDataServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/program/service/ProgramDataServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cz/esgaltur/maxweight/service/ProgramFactoryTest.java" beforeDir="false" />
-    </list>
+    <list default="true" id="e9745d7f-4b84-4a6c-8fcf-9bab82c7bf2b" name="Changes" comment="Add tracing and global exception handling mechanisms&#10;&#10;Introduce `TracingAdvice` and `TracingFilter` for adding trace IDs to responses and logs. Configure tracing-related beans in `TracingConfig`. Implement `GlobalExceptionHandler` to handle common exceptions gracefully." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -212,11 +160,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ProgramIntegrationTest" />
         <item itemvalue="JUnit.WebControllerTest" />
+        <item itemvalue="JUnit.ProgramIntegrationTest" />
+        <item itemvalue="JUnit.ProgramEventListenerTest" />
         <item itemvalue="JUnit.ApiControllerTest" />
         <item itemvalue="JUnit.WebServerTest" />
-        <item itemvalue="JUnit.ProgramEventListenerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -235,7 +183,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748192706661</updated>
-      <workItem from="1748192707093" duration="14390000" />
+      <workItem from="1748192707093" duration="14720000" />
     </task>
     <task id="LOCAL-00001" summary="Migrate project to Spring Boot with enhanced functionality&#10;&#10;The application has been restructured using the Spring Boot framework for better scalability, maintainability, and modern practices. Core features, including training program generation, are now accessible via a web interface and REST API. Legacy code has been removed and replaced with modular services and configuration classes.">
       <option name="closed" value="true" />
@@ -245,7 +193,23 @@
       <option name="project" value="LOCAL" />
       <updated>1748196180605</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Remove legacy implementation and migrate to a Spring Boot-based structure&#10;&#10;This commit removes the old console-based application code, tests, and configurations for outdated infrastructure (like Tomcat disabler) and introduces a new package structure centered around a Spring Boot framework. The application now supports web and REST-based interfaces while relying on updated dependencies and modular design principles.">
+      <option name="closed" value="true" />
+      <created>1748208627514</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1748208627514</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add tracing and global exception handling mechanisms&#10;&#10;Introduce `TracingAdvice` and `TracingFilter` for adding trace IDs to responses and logs. Configure tracing-related beans in `TracingConfig`. Implement `GlobalExceptionHandler` to handle common exceptions gracefully.">
+      <option name="closed" value="true" />
+      <created>1748208668638</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1748208668638</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -256,6 +220,8 @@
     <MESSAGE value="Migrate project to Spring Boot with enhanced functionality&#10;&#10;The application has been restructured using the Spring Boot framework for better scalability, maintainability, and modern practices. Core features, including training program generation, are now accessible via a web interface and REST API. Legacy code has been removed and replaced with modular services and configuration classes." />
     <MESSAGE value="Migrate application to modular architecture with Modulith.&#10;&#10;Reorganized the codebase into modular components: core, program, and web, adhering to Modulith principles. Updated package structure, introduced `ApplicationEventPublisher` for event handling, and adjusted tests accordingly to reflect the new modular design." />
     <MESSAGE value="Migrate to a modularized Spring Boot architecture&#10;&#10;Refactored the application to follow a Modulith architecture by dividing it into `core`, `program`, and `web` modules. Removed the old CLI implementation and integrated a REST API and Thymeleaf web interface. Added event-based communication to improve modularity and maintainability." />
-    <option name="LAST_COMMIT_MESSAGE" value="Migrate to a modularized Spring Boot architecture&#10;&#10;Refactored the application to follow a Modulith architecture by dividing it into `core`, `program`, and `web` modules. Removed the old CLI implementation and integrated a REST API and Thymeleaf web interface. Added event-based communication to improve modularity and maintainability." />
+    <MESSAGE value="Remove legacy implementation and migrate to a Spring Boot-based structure&#10;&#10;This commit removes the old console-based application code, tests, and configurations for outdated infrastructure (like Tomcat disabler) and introduces a new package structure centered around a Spring Boot framework. The application now supports web and REST-based interfaces while relying on updated dependencies and modular design principles." />
+    <MESSAGE value="Add tracing and global exception handling mechanisms&#10;&#10;Introduce `TracingAdvice` and `TracingFilter` for adding trace IDs to responses and logs. Configure tracing-related beans in `TracingConfig`. Implement `GlobalExceptionHandler` to handle common exceptions gracefully." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add tracing and global exception handling mechanisms&#10;&#10;Introduce `TracingAdvice` and `TracingFilter` for adding trace IDs to responses and logs. Configure tracing-related beans in `TracingConfig`. Implement `GlobalExceptionHandler` to handle common exceptions gracefully." />
   </component>
 </project>

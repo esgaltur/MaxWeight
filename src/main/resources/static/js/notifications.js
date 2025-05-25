@@ -29,11 +29,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Parse the notification data
         const data = JSON.parse(e.data);
 
+        // Create message text
+        let message = `Someone generated ${data.programsCount} training program(s) for weeks ${data.fromWeek}-${data.toWeek} with max weight ${data.maxWeight} kg.`;
+
+        // Add trace ID if available
+        if (data.traceId) {
+            message += `<br><small class="text-muted">Trace ID: ${data.traceId}</small>`;
+        }
+
         // Create and show the notification
-        showNotification(
-            'Program Generated', 
-            `Someone generated ${data.programsCount} training program(s) for weeks ${data.fromWeek}-${data.toWeek} with max weight ${data.maxWeight} kg.`
-        );
+        showNotification('Program Generated', message);
     });
 
     // Handle errors
