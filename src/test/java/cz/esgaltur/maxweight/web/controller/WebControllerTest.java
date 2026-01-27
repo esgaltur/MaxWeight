@@ -4,12 +4,14 @@ import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
 import cz.esgaltur.maxweight.core.model.TrainingProgram;
+import cz.esgaltur.maxweight.web.dto.ProgramRangeRequest;
 import cz.esgaltur.maxweight.web.service.ProgramGenerationService;
-import cz.esgaltur.maxweight.web.service.ProgramValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.ui.Model;
 
 import java.util.ArrayList;
@@ -22,9 +24,6 @@ import static org.mockito.Mockito.*;
  * Unit tests for the WebController class.
  */
 public class WebControllerTest {
-
-    @Mock
-    private ProgramValidationService mockValidationService;
 
     @Mock
     private ProgramGenerationService mockGenerationService;
@@ -44,12 +43,15 @@ public class WebControllerTest {
     @Mock
     private TraceContext mockTraceContext;
 
+    @Mock
+    private BindingResult mockBindingResult;
+
     private WebController webController;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        webController = new WebController(mockValidationService, mockGenerationService, mockTracer);
+        webController = new WebController(mockGenerationService, mockTracer);
     }
 
     /**
@@ -78,9 +80,10 @@ public class WebControllerTest {
     @Test
     public void testGenerateProgramWithValidInput() {
         // Arrange
-        int fromWeek = 2;
-        int toWeek = 4;
-        int maxWeight = 100;
+        ProgramRangeRequest request = new ProgramRangeRequest();
+        request.setFromWeek(2);
+        request.setToWeek(4);
+        request.setMaxWeight(100);
         String traceId = "test-trace-id";
 
         List<TrainingProgram> programs = new ArrayList<>();
@@ -88,90 +91,43 @@ public class WebControllerTest {
         programs.add(mockProgram);
         programs.add(mockProgram);
 
-        when(mockValidationService.isValidWeekRange(fromWeek, toWeek)).thenReturn(true);
-        when(mockValidationService.isValidMaxWeight(maxWeight)).thenReturn(true);
-        when(mockGenerationService.generatePrograms(fromWeek, toWeek, maxWeight)).thenReturn(programs);
+        when(mockBindingResult.hasErrors()).thenReturn(false);
+        when(mockGenerationService.generatePrograms(2, 4, 100)).thenReturn(programs);
         when(mockTracer.currentSpan()).thenReturn(mockSpan);
         when(mockSpan.context()).thenReturn(mockTraceContext);
         when(mockTraceContext.traceIdString()).thenReturn(traceId);
 
         // Act
-        String viewName = webController.generateProgram(fromWeek, toWeek, maxWeight, mockModel);
+        String viewName = webController.generateProgram(request, mockBindingResult, mockModel);
 
         // Assert
         assertEquals("result", viewName);
-        verify(mockValidationService).isValidWeekRange(fromWeek, toWeek);
-        verify(mockValidationService).isValidMaxWeight(maxWeight);
-        verify(mockGenerationService).generatePrograms(fromWeek, toWeek, maxWeight);
+        verify(mockGenerationService).generatePrograms(2, 4, 100);
         verify(mockModel).addAttribute("programs", programs);
-        verify(mockModel).addAttribute("maxWeight", maxWeight);
-        verify(mockModel).addAttribute("fromWeek", fromWeek);
-        verify(mockModel).addAttribute("toWeek", toWeek);
+        verify(mockModel).addAttribute("maxWeight", 100);
+        verify(mockModel).addAttribute("fromWeek", 2);
+        verify(mockModel).addAttribute("toWeek", 4);
         verify(mockModel).addAttribute("traceId", traceId);
     }
 
     /**
-     * Test the generateProgram method with invalid week range.
+     * Test the generateProgram method with validation errors.
      */
     @Test
-    public void testGenerateProgramWithInvalidWeekRange() {
-        // Test cases for invalid week range
-        testInvalidWeekRange(0, 4, 100); // fromWeek < 1
-        testInvalidWeekRange(7, 4, 100); // fromWeek > 6
-        testInvalidWeekRange(2, 0, 100); // toWeek < 1
-        testInvalidWeekRange(2, 7, 100); // toWeek > 6
-        testInvalidWeekRange(4, 2, 100); // fromWeek > toWeek
-    }
-
-    /**
-     * Helper method to test invalid week range.
-     */
-    private void testInvalidWeekRange(int fromWeek, int toWeek, int maxWeight) {
+    public void testGenerateProgramWithErrors() {
         // Arrange
-        reset(mockModel, mockValidationService); // Reset mocks to clear previous interactions
-        when(mockValidationService.isValidWeekRange(fromWeek, toWeek)).thenReturn(false);
-        when(mockValidationService.getInvalidWeekRangeMessage()).thenReturn("Invalid week range");
+        ProgramRangeRequest request = new ProgramRangeRequest();
+        ObjectError error = new ObjectError("programRange", "Invalid input");
+
+        when(mockBindingResult.hasErrors()).thenReturn(true);
+        when(mockBindingResult.getAllErrors()).thenReturn(List.of(error));
 
         // Act
-        String viewName = webController.generateProgram(fromWeek, toWeek, maxWeight, mockModel);
+        String viewName = webController.generateProgram(request, mockBindingResult, mockModel);
 
         // Assert
         assertEquals("index", viewName);
-        verify(mockValidationService).isValidWeekRange(fromWeek, toWeek);
-        verify(mockValidationService).getInvalidWeekRangeMessage();
-        verify(mockModel).addAttribute(eq("error"), eq("Invalid week range"));
-        verifyNoInteractions(mockGenerationService); // Ensure generation service is not called
-    }
-
-    /**
-     * Test the generateProgram method with invalid max weight.
-     */
-    @Test
-    public void testGenerateProgramWithInvalidMaxWeight() {
-        // Test cases for invalid max weight
-        testInvalidMaxWeight(2, 4, 0); // maxWeight = 0
-        testInvalidMaxWeight(2, 4, -10); // maxWeight < 0
-    }
-
-    /**
-     * Helper method to test invalid max weight.
-     */
-    private void testInvalidMaxWeight(int fromWeek, int toWeek, int maxWeight) {
-        // Arrange
-        reset(mockModel, mockValidationService); // Reset mocks to clear previous interactions
-        when(mockValidationService.isValidWeekRange(fromWeek, toWeek)).thenReturn(true);
-        when(mockValidationService.isValidMaxWeight(maxWeight)).thenReturn(false);
-        when(mockValidationService.getInvalidMaxWeightMessage()).thenReturn("Max weight must be greater than 0");
-
-        // Act
-        String viewName = webController.generateProgram(fromWeek, toWeek, maxWeight, mockModel);
-
-        // Assert
-        assertEquals("index", viewName);
-        verify(mockValidationService).isValidWeekRange(fromWeek, toWeek);
-        verify(mockValidationService).isValidMaxWeight(maxWeight);
-        verify(mockValidationService).getInvalidMaxWeightMessage();
-        verify(mockModel).addAttribute(eq("error"), eq("Max weight must be greater than 0"));
-        verifyNoInteractions(mockGenerationService); // Ensure generation service is not called
+        verify(mockModel).addAttribute("error", "Invalid input");
+        verifyNoInteractions(mockGenerationService);
     }
 }

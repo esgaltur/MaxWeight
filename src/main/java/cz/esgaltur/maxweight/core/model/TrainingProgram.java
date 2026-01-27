@@ -1,6 +1,7 @@
 package cz.esgaltur.maxweight.core.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class TrainingProgram {
      * @return The list of exercises for the day
      */
     public List<Exercise> getExercisesForDay(Day day) {
-        return exercises.get(day);
+        return Collections.unmodifiableList(exercises.get(day));
     }
 
     /**
@@ -83,6 +84,10 @@ public class TrainingProgram {
      * @return The map of exercises for each day
      */
     public Map<Day, List<Exercise>> getExercises() {
-        return exercises;
+        Map<Day, List<Exercise>> unmodifiable = new EnumMap<>(Day.class);
+        for (Map.Entry<Day, List<Exercise>> entry : exercises.entrySet()) {
+            unmodifiable.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
+        }
+        return Collections.unmodifiableMap(unmodifiable);
     }
 }

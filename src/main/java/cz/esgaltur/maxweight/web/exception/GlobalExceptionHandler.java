@@ -4,11 +4,18 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+
+import jakarta.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Global exception handler for the application.
@@ -72,5 +79,46 @@ public class GlobalExceptionHandler {
         } else {
             logger.error("IO error occurred", ex);
         }
+    }
+
+    /**
+     * Handle constraint violations for request parameters.
+     *
+     * @param ex the ConstraintViolationException
+     * @return Problem detail response
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolationException(ConstraintViolationException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Validation failed");
+        problemDetail.setDetail("Request parameters did not pass validation.");
+        problemDetail.setProperty("errors", extractConstraintMessages(ex));
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    /**
+     * Handle validation errors for request bodies and model attributes.
+     *
+     * @param ex the MethodArgumentNotValidException
+     * @return Problem detail response
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ProblemDetail> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Validation failed");
+        problemDetail.setDetail("Request body did not pass validation.");
+        problemDetail.setProperty(
+            "errors",
+            ex.getBindingResult().getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.toList())
+        );
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    private List<String> extractConstraintMessages(ConstraintViolationException ex) {
+        return ex.getConstraintViolations().stream()
+            .map(violation -> violation.getMessage())
+            .collect(Collectors.toList());
     }
 }

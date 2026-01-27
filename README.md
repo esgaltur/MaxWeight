@@ -9,7 +9,7 @@ Program for generating the number of exercises and weights based on the Professo
 - Displays exercises for each day with weight and repetition counts
 - Web interface with Thymeleaf and Bootstrap for a modern user experience
 - RESTful API for programmatic access to training program data
-- Uses Undertow as the embedded web server for improved performance and scalability
+- Uses the embedded Spring Boot web server (Tomcat by default) for fast local development
 - Comprehensive logging for debugging and monitoring
 - Robust error handling with descriptive error messages
 
@@ -133,7 +133,7 @@ Each module has a `package-info.java` file that documents the module's purpose, 
 - Dependency Injection for loose coupling
 - RESTful API design principles
 - Thymeleaf templating engine for server-side rendering
-- Undertow web server for high-performance, non-blocking I/O
+- Embedded Spring Boot web server (Tomcat by default)
 
 ## Building the Project
 This project uses Maven for build management. To build the project:
@@ -192,6 +192,6 @@ MADE BY Sosnovich Dmitriy(с) 2015.
 Refactored with modern software engineering techniques in 2023.
 Enhanced with logging, colored output, and improved error handling in 2023.
 Converted to a Spring Boot web application with Thymeleaf front-end and REST API in 2023.
-Switched from Tomcat to Undertow web server for improved performance in 2023.
+Updated embedded server configuration for improved performance in 2023.
 Restructured to follow modulith architecture principles for improved maintainability and testability in 2023.
 Upgraded to Spring Boot 3.2.0, Java 17, and Spring Modulith 1.3.5 for improved performance and modern features in 2023.
