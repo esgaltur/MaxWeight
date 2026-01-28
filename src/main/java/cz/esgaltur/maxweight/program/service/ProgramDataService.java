@@ -25,6 +25,7 @@ public class ProgramDataService {
 
         initializeWeightPercentages();
         initializeRepetitionCounts();
+        validateProgramData();
     }
 
     /**
@@ -97,6 +98,34 @@ public class ProgramDataService {
                 {10, 8, 5, 3, 2},
                 {10, 8, 5, 3, 2}
             });
+    }
+
+    private void validateProgramData() {
+        int dayCount = Day.values().length;
+        for (Week week : Week.values()) {
+            int[][] weights = weightPercentages.get(week);
+            int[][] repetitions = repetitionCounts.get(week);
+
+            if (weights == null || repetitions == null) {
+                throw new IllegalStateException("Missing program data for " + week);
+            }
+
+            if (weights.length != dayCount || repetitions.length != dayCount) {
+                throw new IllegalStateException("Program data must include " + dayCount + " days for " + week);
+            }
+
+            for (Day day : Day.values()) {
+                int index = day.getIndex();
+                if (index >= weights.length || index >= repetitions.length) {
+                    throw new IllegalStateException("Program data missing entries for " + day + " in " + week);
+                }
+                if (weights[index].length != repetitions[index].length) {
+                    throw new IllegalStateException(
+                        "Weight and repetition counts must align for " + week + " " + day
+                    );
+                }
+            }
+        }
     }
 
     /**

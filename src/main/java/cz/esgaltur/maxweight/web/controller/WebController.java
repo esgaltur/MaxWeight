@@ -2,14 +2,16 @@ package cz.esgaltur.maxweight.web.controller;
 
 import brave.Tracer;
 import cz.esgaltur.maxweight.core.model.TrainingProgram;
+import cz.esgaltur.maxweight.web.dto.ProgramRangeRequest;
 import cz.esgaltur.maxweight.web.service.ProgramGenerationService;
-import cz.esgaltur.maxweight.web.service.ProgramValidationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -21,13 +23,12 @@ import java.util.List;
 public class WebController {
 
     public static final String INDEX = "index";
-    private final ProgramValidationService validationService;
+    private static final String PAGE_TITLE = "MaxWeight - Bench Press Training Program Generator";
     private final ProgramGenerationService generationService;
     private final Tracer tracer;
 
     @Autowired
-    public WebController(ProgramValidationService validationService, ProgramGenerationService generationService, Tracer tracer) {
-        this.validationService = validationService;
+    public WebController(ProgramGenerationService generationService, Tracer tracer) {
         this.generationService = generationService;
         this.tracer = tracer;
     }
@@ -40,12 +41,7 @@ public class WebController {
      */
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("title", "MaxWeight - Bench Press Training Program Generator");
-
-        if (tracer.currentSpan() != null) {
-            String traceId = tracer.currentSpan().context().traceIdString();
-            model.addAttribute("traceId", traceId);
-        }
+        applyPageMetadata(model);
 
         return INDEX;
     }
@@ -53,43 +49,44 @@ public class WebController {
     /**
      * Generate and display training programs
      * 
-     * @param fromWeek The starting week number
-     * @param toWeek The ending week number
-     * @param maxWeight The maximum weight for bench press
+     * @param request The validated program range request
+     * @param bindingResult Binding result for validation errors
      * @param model The Spring MVC model
      * @return The name of the Thymeleaf template
      */
     @PostMapping("/generate")
     public String generateProgram(
-            @RequestParam("fromWeek") int fromWeek,
-            @RequestParam("toWeek") int toWeek,
-            @RequestParam("maxWeight") int maxWeight,
+            @Valid @ModelAttribute("programRange") ProgramRangeRequest request,
+            BindingResult bindingResult,
             Model model) {
 
-        // Validate input
-        if (!validationService.isValidWeekRange(fromWeek, toWeek)) {
-            model.addAttribute("error", validationService.getInvalidWeekRangeMessage());
-            return INDEX;
-        }
+        applyPageMetadata(model);
 
-        if (!validationService.isValidMaxWeight(maxWeight)) {
-            model.addAttribute("error", validationService.getInvalidMaxWeightMessage());
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error", bindingResult.getAllErrors().get(0).getDefaultMessage());
             return INDEX;
         }
 
         // Generate programs
-        List<TrainingProgram> programs = generationService.generatePrograms(fromWeek, toWeek, maxWeight);
+        List<TrainingProgram> programs = generationService.generatePrograms(
+            request.getFromWeek(),
+            request.getToWeek(),
+            request.getMaxWeight()
+        );
 
         model.addAttribute("programs", programs);
-        model.addAttribute("maxWeight", maxWeight);
-        model.addAttribute("fromWeek", fromWeek);
-        model.addAttribute("toWeek", toWeek);
+        model.addAttribute("maxWeight", request.getMaxWeight());
+        model.addAttribute("fromWeek", request.getFromWeek());
+        model.addAttribute("toWeek", request.getToWeek());
 
+        return "result";
+    }
+
+    private void applyPageMetadata(Model model) {
+        model.addAttribute("title", PAGE_TITLE);
         if (tracer.currentSpan() != null) {
             String traceId = tracer.currentSpan().context().traceIdString();
             model.addAttribute("traceId", traceId);
         }
-
-        return "result";
     }
 }

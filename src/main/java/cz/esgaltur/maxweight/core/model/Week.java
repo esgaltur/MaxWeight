@@ -23,6 +23,47 @@ public enum Week {
     }
 
     /**
+     * Determine if a week number exists in the enum.
+     *
+     * @param weekNumber The week number to check
+     * @return true if the week number is defined
+     */
+    public static boolean isValidWeekNumber(int weekNumber) {
+        for (Week week : values()) {
+            if (week.getWeekNumber() == weekNumber) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the minimum week number supported by the enum.
+     *
+     * @return The minimum week number
+     */
+    public static int minWeekNumber() {
+        int min = Integer.MAX_VALUE;
+        for (Week week : values()) {
+            min = Math.min(min, week.getWeekNumber());
+        }
+        return min == Integer.MAX_VALUE ? 1 : min;
+    }
+
+    /**
+     * Get the maximum week number supported by the enum.
+     *
+     * @return The maximum week number
+     */
+    public static int maxWeekNumber() {
+        int max = Integer.MIN_VALUE;
+        for (Week week : values()) {
+            max = Math.max(max, week.getWeekNumber());
+        }
+        return max == Integer.MIN_VALUE ? 1 : max;
+    }
+
+    /**
      * Get a Week enum value from a week number
      * 
      * @param weekNumber The week number (1-6)

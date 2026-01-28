@@ -5,6 +5,7 @@ package cz.esgaltur.maxweight.core.model;
  * Encapsulates the weight percentage, actual weight, and repetition count.
  */
 public class Exercise {
+    public static final double DEFAULT_ROUNDING_INCREMENT = 2.5;
     private final int weightPercentage;
     private final double actualWeight;
     private final int repetitions;
@@ -62,7 +63,8 @@ public class Exercise {
     }
 
     /**
-     * Factory method to create an exercise from percentage, max weight, repetitions, and day
+     * Factory method to create an exercise from percentage, max weight, repetitions, and day.
+     * Rounds the calculated weight to {@link #DEFAULT_ROUNDING_INCREMENT}.
      * 
      * @param percentage The percentage of the maximum weight
      * @param maxWeight The maximum weight
@@ -71,7 +73,22 @@ public class Exercise {
      * @return A new Exercise instance
      */
     public static Exercise create(int percentage, int maxWeight, int repetitions, Day day) {
-        double actualWeight = calculateWeight(maxWeight, percentage);
+        double actualWeight = calculateWeight(maxWeight, percentage, DEFAULT_ROUNDING_INCREMENT);
+        return new Exercise(percentage, actualWeight, repetitions, day);
+    }
+
+    /**
+     * Factory method to create an exercise with a custom rounding increment.
+     *
+     * @param percentage The percentage of the maximum weight
+     * @param maxWeight The maximum weight
+     * @param repetitions The number of repetitions
+     * @param day The day this exercise belongs to
+     * @param roundingIncrement The rounding increment (e.g., 2.5 for kg plates)
+     * @return A new Exercise instance
+     */
+    public static Exercise create(int percentage, int maxWeight, int repetitions, Day day, double roundingIncrement) {
+        double actualWeight = calculateWeight(maxWeight, percentage, roundingIncrement);
         return new Exercise(percentage, actualWeight, repetitions, day);
     }
 
@@ -80,9 +97,18 @@ public class Exercise {
      * 
      * @param maxWeight The maximum weight
      * @param percentage The percentage to calculate
+     * @param roundingIncrement The rounding increment
      * @return The calculated weight
      */
-    private static double calculateWeight(int maxWeight, int percentage) {
-        return (maxWeight * percentage) / 100.0;
+    private static double calculateWeight(int maxWeight, int percentage, double roundingIncrement) {
+        double rawWeight = (maxWeight * percentage) / 100.0;
+        return roundToIncrement(rawWeight, roundingIncrement);
+    }
+
+    private static double roundToIncrement(double value, double increment) {
+        if (increment <= 0) {
+            return value;
+        }
+        return Math.round(value / increment) * increment;
     }
 }
