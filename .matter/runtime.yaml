@@ -1,0 +1,24 @@
+before-command: |-
+  #!/bin/bash
+  set -e
+
+  # Remove problematic Yarn repository (not needed for this project)
+  sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null || true
+
+  # Install Maven
+  sudo apt-get update
+  sudo apt-get install -y maven
+
+  # Install dependencies and build the application
+  mvn clean install -DskipTests
+preview-commands:
+  - id: spring-boot-app
+    title: Spring Boot Web Application
+    description: Runs the MaxWeight Spring Boot web application
+    command: |-
+      #!/bin/bash
+      set -e
+
+      # Run Spring Boot application in development mode
+      mvn spring-boot:run
+preview-port: 8080
