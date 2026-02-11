@@ -1,0 +1,702 @@
+openapi: 3.0.3
+info:
+  title: MaxWeight Training Program API
+  description: REST API for generating weight training programs based on Professor Yuri Verkhoshansky's methodology
+  version: 2.0.0
+  contact:
+    name: Dmitriy Sosnovich
+    email: support@esgaltur.cz
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User authentication and registration endpoints
+  - name: Training Programs
+    description: Training program generation endpoints
+  - name: User Management
+    description: User profile management endpoints
+  - name: Sync
+    description: Synchronization endpoints for mobile clients
+
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input or user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/programs/{weekNumber}:
+    get:
+      tags:
+        - Training Programs
+      summary: Get training program for a specific week
+      operationId: getProgram
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekNumber
+          in: path
+          required: true
+          description: Week number (1-6)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 6
+        - name: maxWeight
+          in: query
+          required: true
+          description: Maximum bench press weight in kg
+          schema:
+            type: number
+            format: double
+            minimum: 20
+            maximum: 500
+      responses:
+        '200':
+          description: Training program retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingProgramResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/programs:
+    get:
+      tags:
+        - Training Programs
+      summary: Get multiple training programs
+      operationId: getPrograms
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: fromWeek
+          in: query
+          required: true
+          description: Starting week number (1-6)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 6
+        - name: toWeek
+          in: query
+          required: true
+          description: Ending week number (1-6)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 6
+        - name: maxWeight
+          in: query
+          required: true
+          description: Maximum bench press weight in kg
+          schema:
+            type: number
+            format: double
+            minimum: 20
+            maximum: 500
+      responses:
+        '200':
+          description: Training programs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrainingProgramResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/profile:
+    get:
+      tags:
+        - User Management
+      summary: Get current user profile
+      operationId: getUserProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - User Management
+      summary: Update user profile
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sync/programs:
+    get:
+      tags:
+        - Sync
+      summary: Get all saved training programs for sync
+      operationId: getSavedPrograms
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: since
+          in: query
+          required: false
+          description: Get programs updated after this timestamp (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Saved programs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedProgramResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Sync
+      summary: Save or update a training program
+      operationId: saveProgram
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveProgramRequest'
+      responses:
+        '200':
+          description: Program saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedProgramResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sync/programs/{weekNumber}:
+    delete:
+      tags:
+        - Sync
+      summary: Delete a saved training program
+      operationId: deleteProgram
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekNumber
+          in: path
+          required: true
+          description: Week number (1-6)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 6
+      responses:
+        '204':
+          description: Program deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: john_doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 100
+          example: SecurePassword123!
+        maxWeight:
+          type: number
+          format: double
+          minimum: 20
+          maximum: 500
+          description: User's maximum bench press weight in kg
+          example: 100.0
+
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: john_doe
+        password:
+          type: string
+          format: password
+          example: SecurePassword123!
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        refreshToken:
+          type: string
+          description: JWT refresh token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          format: int64
+          description: Token expiration time in seconds
+          example: 3600
+        username:
+          type: string
+          example: john_doe
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        maxWeight:
+          type: number
+          format: double
+          description: User's maximum bench press weight in kg
+          example: 100.0
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-15T10:30:00Z
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: newemail@example.com
+        maxWeight:
+          type: number
+          format: double
+          minimum: 20
+          maximum: 500
+          description: User's maximum bench press weight in kg
+          example: 105.0
+        currentPassword:
+          type: string
+          format: password
+          description: Required if changing password
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 100
+          description: New password (optional)
+
+    TrainingProgramResponse:
+      type: object
+      properties:
+        weekNumber:
+          type: integer
+          minimum: 1
+          maximum: 6
+          example: 1
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayResponse'
+
+    DayResponse:
+      type: object
+      properties:
+        dayNumber:
+          type: integer
+          example: 1
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseResponse'
+
+    ExerciseResponse:
+      type: object
+      properties:
+        setNumber:
+          type: integer
+          example: 1
+        weight:
+          type: number
+          format: double
+          description: Weight in kg
+          example: 80.0
+        repetitions:
+          type: integer
+          example: 5
+        percentage:
+          type: integer
+          description: Percentage of max weight
+          example: 80
+
+    SavedProgramResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        weekNumber:
+          type: integer
+          minimum: 1
+          maximum: 6
+          example: 1
+        maxWeight:
+          type: number
+          format: double
+          example: 100.0
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedDayResponse'
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-15T10:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-15T10:30:00Z
+        version:
+          type: integer
+          format: int64
+          description: Version number for conflict resolution
+          example: 1
+
+    SavedDayResponse:
+      type: object
+      properties:
+        dayNumber:
+          type: integer
+          example: 1
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedExerciseResponse'
+        completed:
+          type: boolean
+          example: false
+        completedAt:
+          type: string
+          format: date-time
+          example: 2023-01-15T10:30:00Z
+
+    SavedExerciseResponse:
+      type: object
+      properties:
+        setNumber:
+          type: integer
+          example: 1
+        weight:
+          type: number
+          format: double
+          example: 80.0
+        repetitions:
+          type: integer
+          example: 5
+        percentage:
+          type: integer
+          example: 80
+        completed:
+          type: boolean
+          example: false
+        actualRepetitions:
+          type: integer
+          description: Actual repetitions performed
+          example: 5
+
+    SaveProgramRequest:
+      type: object
+      required:
+        - weekNumber
+        - maxWeight
+        - days
+      properties:
+        weekNumber:
+          type: integer
+          minimum: 1
+          maximum: 6
+          example: 1
+        maxWeight:
+          type: number
+          format: double
+          minimum: 20
+          maximum: 500
+          example: 100.0
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/SaveDayRequest'
+        version:
+          type: integer
+          format: int64
+          description: Version number for conflict resolution
+          example: 1
+
+    SaveDayRequest:
+      type: object
+      required:
+        - dayNumber
+        - exercises
+      properties:
+        dayNumber:
+          type: integer
+          example: 1
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/SaveExerciseRequest'
+        completed:
+          type: boolean
+          example: false
+        completedAt:
+          type: string
+          format: date-time
+          example: 2023-01-15T10:30:00Z
+
+    SaveExerciseRequest:
+      type: object
+      required:
+        - setNumber
+        - weight
+        - repetitions
+        - percentage
+      properties:
+        setNumber:
+          type: integer
+          example: 1
+        weight:
+          type: number
+          format: double
+          example: 80.0
+        repetitions:
+          type: integer
+          example: 5
+        percentage:
+          type: integer
+          example: 80
+        completed:
+          type: boolean
+          example: false
+        actualRepetitions:
+          type: integer
+          example: 5
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: 2023-01-15T10:30:00Z
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: Invalid week number. Must be between 1 and 6.
+        path:
+          type: string
+          example: /api/programs/7
