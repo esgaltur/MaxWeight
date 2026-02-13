@@ -1,0 +1,35 @@
+before-command: |-
+  #!/bin/bash
+  set -e
+
+  # Remove problematic Yarn repository (not needed for this project)
+  sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null || true
+
+  # Install Maven
+  sudo apt-get update
+  sudo apt-get install -y maven
+
+  # Install MongoDB
+  sudo apt-get install -y gnupg curl
+  curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor
+  echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+  sudo apt-get update
+  sudo apt-get install -y mongodb-org
+
+  # Start MongoDB
+  sudo systemctl start mongod
+  sudo systemctl enable mongod
+
+  # Install dependencies and build the application
+  mvn clean install -DskipTests
+preview-commands:
+  - id: spring-boot-app
+    title: Spring Boot Web Application
+    description: Runs the MaxWeight Spring Boot web application
+    command: |-
+      #!/bin/bash
+      set -e
+
+      # Run Spring Boot application in development mode
+      mvn spring-boot:run
+preview-port: 8080
